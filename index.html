@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>❤️ 最爱的老婆大人 ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: #FFE4E1;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* ===== 页面容器 ===== */
+        .container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            max-height: 850px;
+            background: #FFE4E1;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        /* ===== Page1: 爱心页面 ===== */
+        #page1 {
+            width: 100%;
+            height: 100%;
+            background: #FFE4E1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.5s ease;
+            z-index: 10;
+            cursor: pointer;
+        }
+        #page1.hidden {
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 爱心 SVG */
+        .heart-container {
+            width: 260px;
+            height: 260px;
+            position: relative;
+            animation: heartBeat 1.2s ease-in-out infinite;
+        }
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            14% { transform: scale(1.15); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.1); }
+            70% { transform: scale(1); }
+        }
+        .heart-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.3));
+        }
+
+        .heart-title {
+            font-family: '华文行楷', 'STXingkai', cursive;
+            font-size: 28px;
+            font-weight: bold;
+            color: #FF1493;
+            text-align: center;
+            margin-top: 20px;
+            line-height: 1.4;
+            text-shadow: 0 2px 10px rgba(255, 20, 147, 0.2);
+        }
+
+        .heart-hint {
+            font-size: 16px;
+            color: #FF69B4;
+            margin-top: 30px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* 闪烁粒子 */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.2); }
+        }
+
+        /* ===== Page2: 问答页面 ===== */
+        #page2 {
+            width: 100%;
+            height: 100%;
+            background: #FFF0F5;
+            display: none;
+            flex-direction: column;
+            padding: 20px 16px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 20;
+            overflow-y: auto;
+        }
+        #page2.active {
+            display: flex;
+        }
+
+        .page2-title {
+            font-family: '华文行楷', 'STXingkai', cursive;
+            font-size: 26px;
+            font-weight: bold;
+            color: #FF1493;
+            text-align: center;
+            padding: 10px 0 6px 0;
+            flex-shrink: 0;
+        }
+
+        .question-text {
+            font-size: 18px;
+            color: #C71585;
+            text-align: center;
+            padding: 12px 8px;
+            line-height: 1.6;
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+
+        .options-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 4px 0 10px 0;
+            overflow-y: auto;
+        }
+
+        /* 单选题按钮 */
+        .option-btn {
+            padding: 14px 20px;
+            font-size: 17px;
+            font-weight: bold;
+            background: #FFB6C1;
+            color: #8B008B;
+            border: 3px solid #FFB6C1;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .option-btn:active {
+            transform: scale(0.96);
+            background: #FF69B4;
+            color: white;
+        }
+        .option-btn.selected {
+            background: #FF69B4;
+            color: white;
+            border-color: #FF1493;
+        }
+
+        /* 多选题网格 */
+        .multi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+        .multi-grid .option-btn {
+            padding: 12px 10px;
+            font-size: 15px;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .multi-grid .option-btn.checked {
+            background: #FF69B4;
+            color: white;
+            border-color: #FF1493;
+        }
+        .multi-grid .option-btn .check-mark {
+            margin-right: 6px;
+        }
+
+        /* 确认按钮 */
+        .submit-btn {
+            padding: 14px;
+            font-size: 18px;
+            font-weight: bold;
+            background: #FF69B4;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+        .submit-btn:active {
+            transform: scale(0.96);
+            background: #FF1493;
+        }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            transform: none;
+        }
+
+        /* 文本框 */
+        .text-input {
+            width: 100%;
+            min-height: 140px;
+            padding: 14px;
+            font-size: 16px;
+            font-family: 'Microsoft YaHei', sans-serif;
+            border: 3px solid #FFB6C1;
+            border-radius: 14px;
+            background: #FFFAF0;
+            color: #8B008B;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .text-input:focus {
+            border-color: #FF69B4;
+        }
+
+        /* 反馈标签 */
+        .feedback {
+            text-align: center;
+            font-size: 17px;
+            color: #FF1493;
+            padding: 8px 0;
+            min-height: 44px;
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+        .feedback.error {
+            color: #FF4500;
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            padding: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            background: #FF69B4;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            margin-top: 6px;
+            touch-action: manipulation;
+        }
+        .back-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ===== 彩蛋弹窗 ===== */
+        #eggOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.4s ease;
+        }
+        #eggOverlay.active {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .egg-content {
+            width: 92%;
+            max-width: 500px;
+            max-height: 90vh;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: scaleIn 0.4s ease;
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .egg-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            aspect-ratio: 700/550;
+            object-fit: cover;
+        }
+
+        /* 文字叠加在图片上 */
+        .egg-text-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 24px;
+            pointer-events: none;
+        }
+        .egg-text-overlay .egg-message {
+            font-family: '华文行楷', 'STXingkai', cursive;
+            font-size: clamp(18px, 4vw, 26px);
+            font-weight: bold;
+            color: #FF1493;
+            text-align: center;
+            line-height: 1.7;
+            text-shadow: 
+                -2px -2px 0 #fff,
+                2px -2px 0 #fff,
+                -2px 2px 0 #fff,
+                2px 2px 0 #fff,
+                0 0 12px rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+            max-width: 90%;
+        }
+
+        .egg-close-btn {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 32px;
+            font-size: 17px;
+            font-weight: bold;
+            background: #FF69B4;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 4px 20px rgba(255, 105, 180, 0.4);
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            z-index: 10;
+        }
+        .egg-close-btn:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFF0F5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFB6C1;
+            border-radius: 10px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 400px) {
+            .heart-container { width: 180px; height: 180px; }
+            .heart-title { font-size: 22px; }
+            .page2-title { font-size: 20px; }
+            .question-text { font-size: 16px; }
+            .option-btn { font-size: 15px; padding: 12px 14px; }
+            .multi-grid .option-btn { font-size: 13px; padding: 10px 8px; min-height: 48px; }
+            .egg-text-overlay .egg-message { font-size: clamp(15px, 3.5vw, 20px); }
+        }
+        @media (min-width: 600px) {
+            .container { border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+            body { padding: 20px; background: #f0d0d0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- ===== Page1: 爱心页面 ===== -->
+    <div id="page1" onclick="switchToQA()">
+        <div class="heart-container">
+            <svg class="heart-svg" viewBox="0 0 100 100">
+                <defs>
+                    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FF69B4;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#FF1493;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path d="M50 88 C20 65 0 50 0 30 C0 10 20 0 35 5 C42 8 48 15 50 20 C52 15 58 8 65 5 C80 0 100 10 100 30 C100 50 80 65 50 88Z"
+                      fill="url(#heartGrad)" stroke="#FF1493" stroke-width="2"/>
+                <text x="50" y="48" text-anchor="middle" font-size="22" fill="white" font-weight="bold">❤</text>
+            </svg>
+        </div>
+        <div class="heart-title">最爱的老婆大人<br>蓝欣雨宝贝</div>
+        <div class="heart-hint">❤️ 点击爱心开始问答 ❤️</div>
+        <!-- 粒子由 JS 生成 -->
+        <div id="particlesContainer" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;"></div>
+    </div>
+
+    <!-- ===== Page2: 问答页面 ===== -->
+    <div id="page2">
+        <div class="page2-title">🌸 给老婆大人的专属问答 🌸</div>
+        <div class="question-text" id="questionText">加载中...</div>
+        <div class="options-area" id="optionsArea"></div>
+        <div class="feedback" id="feedback"></div>
+        <button class="back-btn" onclick="backToHeart()">❤️ 返回爱心 ❤️</button>
+    </div>
+</div>
+
+<!-- ===== 彩蛋弹窗 ===== -->
+<div id="eggOverlay" onclick="closeEgg(event)">
+    <div class="egg-content" onclick="event.stopPropagation()">
+        <img id="eggImage" class="egg-image" src="" alt="彩蛋背景">
+        <div class="egg-text-overlay">
+            <div class="egg-message" id="eggMessage">
+                老婆一直是老公最爱最爱最爱的人，<br>
+                现在是将来是过去也是，<br>
+                想和老婆一直在一起一直一直，<br>
+                爱你我最爱的臭老婆，<br>
+                希望你每天都能健健康康，无忧无虑，开开心心 💕
+            </div>
+        </div>
+        <button class="egg-close-btn" onclick="closeEgg()">💕 收到老婆的爱 💕</button>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // 配置
+    // ============================================================
+    // 背景图片 URL（部署后换成你的图片地址）
+    const EGG_IMAGE_URL = "6d71dabd81a749783774f8b55bb7d87b.jpg";
+    // 如果图片和 HTML 不在同一目录，请修改为完整 URL，例如：
+    // const EGG_IMAGE_URL = "https://你的域名.com/images/6d71dabd81a749783774f8b55bb7d87b.jpg";
+
+    // ============================================================
+    // 题库
+    // ============================================================
+    const qaList = [
+        {
+            question: "第一题：老公最爱的人是谁？",
+            options: ["A. 蓝欣雨", "B. 老公的臭一二", "C. 老公的臭老婆"],
+            type: "single"
+        },
+        {
+            question: "第二题（多选题）：老婆的优点有哪些？",
+            options: ["A. 能吃", "B. 能睡觉", "C. 能爱老公"],
+            type: "multi"
+        },
+        {
+            question: "第三题（多选题）：老公最喜欢老婆的什么？",
+            options: ["A. 可爱", "B. 温柔", "C. 体贴", "D. 漂亮", "E. 能吃", "F. 白白胖胖", "G. 抱抱亲亲老公"],
+            type: "multi"
+        },
+        {
+            question: "第四题：写一段想对老公说的话吧 💕",
+            options: [],
+            type: "text"
+        }
+    ];
+
+    let currentIndex = 0;
+    let multiSelections = {};
+
+    // ============================================================
+    // DOM 引用
+    // ============================================================
+    const page1 = document.getElementById('page1');
+    const page2 = document.getElementById('page2');
+    const questionText = document.getElementById('questionText');
+    const optionsArea = document.getElementById('optionsArea');
+    const feedback = document.getElementById('feedback');
+    const eggOverlay = document.getElementById('eggOverlay');
+    const eggImage = document.getElementById('eggImage');
+
+    // ============================================================
+    // 爱心页粒子
+    // ============================================================
+    function createParticles() {
+        const container = document.getElementById('particlesContainer');
+        const colors = ['#FF69B4', '#FF1493', '#FFB6C1', '#FF99CC', '#FF66AA'];
+        for (let i = 0; i < 35; i++) {
+            const el = document.createElement('div');
+            el.className = 'particle';
+            const size = 4 + Math.random() * 6;
+            el.style.width = size + 'px';
+            el.style.height = size + 'px';
+            el.style.background = colors[Math.floor(Math.random() * colors.length)];
+            el.style.left = Math.random() * 90 + '%';
+            el.style.top = Math.random() * 90 + '%';
+            el.style.animationDelay = Math.random() * 3 + 's';
+            el.style.animationDuration = (2 + Math.random() * 3) + 's';
+            container.appendChild(el);
+        }
+    }
+    createParticles();
+
+    // ============================================================
+    // 页面切换
+    // ============================================================
+    function switchToQA() {
+        page1.classList.add('hidden');
+        page2.classList.add('active');
+        showQuestion(0);
+    }
+
+    function backToHeart() {
+        page2.classList.remove('active');
+        page1.classList.remove('hidden');
+        // 重置所有状态
+        currentIndex = 0;
+        multiSelections = {};
+        feedback.textContent = '';
+        feedback.className = 'feedback';
+        document.querySelector('.page2-title').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ============================================================
+    // 显示题目
+    // ============================================================
+    function showQuestion(index) {
+        currentIndex = index;
+        multiSelections = {};
+        feedback.textContent = '';
+        feedback.className = 'feedback';
+
+        if (index >= qaList.length) {
+            questionText.textContent = '🎉 全部完成！老婆最棒！ 🎉';
+            optionsArea.innerHTML = '';
+            return;
+        }
+
+        const q = qaList[index];
+        questionText.textContent = `第 ${index + 1} 题：${q.question}`;
+        optionsArea.innerHTML = '';
+
+        if (q.type === 'single') {
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.onclick = () => selectSingle(opt);
+                optionsArea.appendChild(btn);
+            });
+        } else if (q.type === 'multi') {
+            const grid = document.createElement('div');
+            grid.className = 'multi-grid';
+
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.dataset.option = opt;
+                btn.innerHTML = `<span class="check-mark">☐</span> ${opt}`;
+                btn.onclick = () => toggleMulti(btn);
+                grid.appendChild(btn);
+            });
+            optionsArea.appendChild(grid);
+
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'submit-btn';
+            submitBtn.textContent = '✅ 确认选择';
+            submitBtn.onclick = submitMulti;
+            optionsArea.appendChild(submitBtn);
+        } else if (q.type === 'text') {
+            const textarea = document.createElement('textarea');
+            textarea.className = 'text-input';
+            textarea.placeholder = '💕 写你想对老公说的话...';
+            textarea.id = 'textInput';
+            optionsArea.appendChild(textarea);
+
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'submit-btn';
+            submitBtn.textContent = '💌 写给老公的话 💌';
+            submitBtn.onclick = submitText;
+            optionsArea.appendChild(submitBtn);
+        }
+    }
+
+    // ============================================================
+    // 第一题：单选
+    // ============================================================
+    function selectSingle(selected) {
+        feedback.textContent = '💖 老婆大人真棒！ 💖';
+        feedback.className = 'feedback';
+        // 禁用所有按钮
+        document.querySelectorAll('#optionsArea .option-btn').forEach(b => b.disabled = true);
+        setTimeout(() => showQuestion(currentIndex + 1), 300);
+    }
+
+    // ============================================================
+    // 第二、三题：多选
+    // ============================================================
+    function toggleMulti(btn) {
+        btn.classList.toggle('checked');
+        const isChecked = btn.classList.contains('checked');
+        btn.innerHTML = `<span class="check-mark">${isChecked ? '☑' : '☐'}</span> ${btn.dataset.option}`;
+        btn.style.background = isChecked ? '#FF69B4' : '#FFB6C1';
+        btn.style.color = isChecked ? 'white' : '#8B008B';
+        btn.style.borderColor = isChecked ? '#FF1493' : '#FFB6C1';
+    }
+
+    function submitMulti() {
+        const btns = document.querySelectorAll('#optionsArea .multi-grid .option-btn');
+        const checked = Array.from(btns).filter(b => b.classList.contains('checked'));
+        const total = btns.length;
+
+        if (checked.length < total) {
+            feedback.textContent = '⚠️ 选项未选完！请把所有选项都选上哦～';
+            feedback.className = 'feedback error';
+            return;
+        }
+
+        feedback.textContent = '💖 全选通过！老婆大人太了解老公了！ 💖';
+        feedback.className = 'feedback';
+        btns.forEach(b => b.disabled = true);
+        document.querySelector('#optionsArea .submit-btn').disabled = true;
+        setTimeout(() => showQuestion(currentIndex + 1), 1000);
+    }
+
+    // ============================================================
+    // 第四题：文本框
+    // ============================================================
+    function submitText() {
+        const input = document.getElementById('textInput');
+        const content = input ? input.value.trim() : '';
+        if (!content) {
+            feedback.textContent = '💕 写点什么嘛～老公想听你说的话～';
+            feedback.className = 'feedback error';
+            return;
+        }
+        // 触发彩蛋
+        showEgg();
+        feedback.textContent = '🎉 全部完成！老婆最棒！ 🎉';
+        feedback.className = 'feedback';
+        input.disabled = true;
+        document.querySelector('#optionsArea .submit-btn').disabled = true;
+    }
+
+    // ============================================================
+    // 彩蛋弹窗
+    // ============================================================
+    function showEgg() {
+        // 设置背景图片
+        eggImage.src = EGG_IMAGE_URL;
+        // 图片加载失败时显示备用背景色
+        eggImage.onerror = function() {
+            this.style.display = 'none';
+            // 给 .egg-content 添加备用背景
+            const ec = document.querySelector('.egg-content');
+            ec.style.background = 'linear-gradient(135deg, #FFE4E1, #FFB6C1)';
+            // 重新显示文字
+            document.querySelector('.egg-text-overlay .egg-message').style.textShadow = 
+                '-2px -2px 0 rgba(255,255,255,0.8), 2px -2px 0 rgba(255,255,255,0.8), -2px 2px 0 rgba(255,255,255,0.8), 2px 2px 0 rgba(255,255,255,0.8)';
+        };
+        eggImage.onload = function() {
+            this.style.display = 'block';
+            const ec = document.querySelector('.egg-content');
+            ec.style.background = 'transparent';
+        };
+        eggOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEgg(event) {
+        if (event && event.target !== event.currentTarget) return;
+        eggOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // ============================================================
+    // 初始化
+    // ============================================================
+    // 预加载图片（让彩蛋更快显示）
+    const preloadImg = new Image();
+    preloadImg.src = EGG_IMAGE_URL;
+
+    console.log('❤️ 最爱的老婆大人 ❤️ 已加载！');
+    console.log('💕 祝你们永远幸福！');
+</script>
+
+</body>
+</html>
